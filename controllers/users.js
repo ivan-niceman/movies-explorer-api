@@ -8,15 +8,6 @@ const BadRequest = require('../errors/badrequest');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
-const getUser = (req, res, next) => {
-  userModel
-    .find({})
-    .then((users) => {
-      res.send(users);
-    })
-    .catch(next);
-};
-
 const createUser = (req, res, next) => {
   bcrypt
     .hash(req.body.password, 10)
@@ -37,7 +28,7 @@ const createUser = (req, res, next) => {
         next(new Conflict('Пользователь с такой почтой уже существует'));
       }
       if (err.name === 'ValidationError') {
-        next(new BadRequest('Некорректные данные при создании карточки'));
+        next(new BadRequest('Некорректные данные'));
       } else {
         next(err);
       }
@@ -55,7 +46,10 @@ const updateProfile = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequest('Некорректные данные при создании карточки'));
+        next(new BadRequest('Некорректные данные'));
+      }
+      if (err.code === 11000) {
+        next(new Conflict('Пользователь с такой почтой уже существует'));
       } else {
         next(err);
       }
@@ -95,11 +89,10 @@ const getUserInfo = (req, res, next) => {
     .then((user) => {
       res.send(user);
     })
-    .catch(next);
+    .catch((err) => next(err));
 };
 
 module.exports = {
-  getUser,
   createUser,
   updateProfile,
   login,

@@ -3,13 +3,13 @@ const express = require('express');
 const helmet = require('helmet');
 const { errors } = require('celebrate');
 const mongoose = require('mongoose');
-const rateLimit = require('express-rate-limit');
 const cors = require('cors');
+const { limiter } = require('./middlewares/rateLimit');
 const router = require('./routes');
 const serverError = require('./errors/servererror');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3000, MONGO_URL = 'mongodb://127.0.0.1:27017/bitfilmsdb' } = process.env;
 
 const app = express();
 
@@ -29,14 +29,9 @@ app.get('/crash-test', () => {
   }, 0);
 });
 
-mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
-
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+mongoose.connect(MONGO_URL)
+  .then(() => console.log('База данных подключена'))
+  .catch((err) => console.log('Ошибка подключения к базе данных', err));
 
 app.use(helmet());
 app.use(express.json());

@@ -8,19 +8,6 @@ const validateUserBody = celebrate({
   }),
 });
 
-const validateEditUserInfo = celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-  }),
-});
-
-const validateEditUserAvatar = celebrate({
-  body: Joi.object().keys({
-    avatar: Joi.string().pattern(/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/),
-  }),
-});
-
 const validateMovieBody = celebrate({
   body: Joi.object().keys({
     nameRU: Joi.string()
@@ -56,15 +43,14 @@ const validationUserId = celebrate({
 
 const validationMovieId = celebrate({
   params: Joi.object().keys({
-    movieId: Joi.string().alphanum().hex().length(24),
+    movieId: Joi.string().alphanum().hex().length(24)
+      .required(),
   }),
 });
 
 module.exports = {
   validateUserBody,
   validateMovieBody,
-  validateEditUserInfo,
-  validateEditUserAvatar,
   validationUserId,
   validationMovieId,
 };
