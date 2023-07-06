@@ -8,6 +8,13 @@ const validateUserBody = celebrate({
   }),
 });
 
+const validateEditUserInfo = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30).required(),
+    email: Joi.string().required().pattern(/^[A-Z0-9._%+-]+@[A-Z0-9-]+.+.[A-Z]{2,4}$/i),
+  }),
+});
+
 const validateMovieBody = celebrate({
   body: Joi.object().keys({
     nameRU: Joi.string()
@@ -50,6 +57,7 @@ const validationMovieId = celebrate({
 
 module.exports = {
   validateUserBody,
+  validateEditUserInfo,
   validateMovieBody,
   validationUserId,
   validationMovieId,
