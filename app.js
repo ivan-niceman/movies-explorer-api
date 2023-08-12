@@ -1,46 +1,42 @@
 require('dotenv').config();
-const express = require('express');
-const helmet = require('helmet');
 const { errors } = require('celebrate');
+const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
-const { limiter } = require('./middlewares/rateLimit');
-const router = require('./routes');
-const serverError = require('./errors/servererror');
-const { requestLogger, errorLogger } = require('./middlewares/logger');
+const bodyParser = require('body-parser');
+const userRouter = require('./routes/users');
+const movieRouter = require('./routes/movies');
+const { login, createUser } = require('./controllers/users');
+const auth = require('./middlewares/auth');
+const errorPath = require('./utils/errorPath');
 
-const { PORT = 3000, MONGO_URL = 'mongodb://127.0.0.1:27017/bitfilmsdb' } = process.env;
+const { PORT = 3000 } = process.env;
+const errorHandler = require('./middlewares/errorHandler');
+const { createUserValid, loginValid } = require('./middlewares/validate');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
+const cors = require('./middlewares/cors');
 
 const app = express();
 
-app.use(cors({
-  origin: [
-    'https://nice-man.diploma.nomoreparties.sbs',
-    'http://nice-man.diploma.nomoreparties.sbs',
-    'localhost:3000',
-    'http://localhost:3000',
-  ],
-  credentials: true,
-}));
+mongoose.connect('mongodb://127.0.0.1:27017/bitfilmsdb');
 
-app.get('/crash-test', () => {
-  setTimeout(() => {
-    throw new Error('Сервер сейчас упадёт');
-  }, 0);
-});
-
-mongoose.connect(MONGO_URL)
-  .then(() => console.log('База данных подключена'))
-  .catch((err) => console.log('Ошибка подключения к базе данных', err));
-
-app.use(helmet());
-app.use(express.json());
-app.use(limiter);
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors);
 app.use(requestLogger);
-app.use(router);
+
+app.post('/signin', loginValid, login);
+app.post('/signup', createUserValid, createUser);
+
+app.use(auth, userRouter);
+app.use(auth, movieRouter);
+
+app.use('/*', auth, errorPath);
+
 app.use(errorLogger);
+
 app.use(errors());
-app.use(serverError);
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);

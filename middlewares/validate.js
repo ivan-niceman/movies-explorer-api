@@ -1,64 +1,59 @@
 const { celebrate, Joi } = require('celebrate');
+const validator = require('validator');
 
-const validateUserBody = celebrate({
+const urlValidationHandler = (value, helpers) => {
+  if (validator.isURL(value)) return value;
+  return helpers.message('Некорректный формат ссылки');
+};
+
+const loginValid = celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().pattern(/^[A-Z0-9._%+-]+@[A-Z0-9-]+.+.[A-Z]{2,4}$/i),
+    email: Joi.string().required().email(),
     password: Joi.string().required(),
-    name: Joi.string().min(2).max(30).required(),
   }),
 });
 
-const validateEditUserInfo = celebrate({
+const createUserValid = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30).required(),
-    email: Joi.string().required().pattern(/^[A-Z0-9._%+-]+@[A-Z0-9-]+.+.[A-Z]{2,4}$/i),
+    name: Joi.string().required().min(2).max(30),
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
   }),
 });
 
-const validateMovieBody = celebrate({
+const updateUserValid = celebrate({
   body: Joi.object().keys({
-    nameRU: Joi.string()
-      .required()
-      .pattern(/^[а-яА-Я\s0-9!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]+$/u),
-    nameEN: Joi.string()
-      .required()
-      .pattern(/^[a-zA-Z\s0-9!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]+$/),
+    name: Joi.string().required().min(2).max(30),
+    email: Joi.string().required().email(),
+  }),
+});
+
+const createMovieValidate = celebrate({
+  body: Joi.object().keys({
     country: Joi.string().required(),
     director: Joi.string().required(),
     duration: Joi.number().required(),
     year: Joi.string().required(),
     description: Joi.string().required(),
-    image: Joi.string()
-      .required()
-      .pattern(/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/),
-    trailerLink: Joi.string()
-      .required()
-      .pattern(/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/),
-    thumbnail: Joi.string()
-      .required()
-      .pattern(/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/),
-    owner: Joi.string().optional(),
+    image: Joi.string().required().custom(urlValidationHandler),
+    trailerLink: Joi.string().required().custom(urlValidationHandler),
+    thumbnail: Joi.string().required().custom(urlValidationHandler),
     movieId: Joi.number().required(),
+    nameRU: Joi.string().required(),
+    nameEN: Joi.string().required(),
   }),
 });
 
-const validationUserId = celebrate({
+const deleteMovieValidate = celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().alphanum().hex().length(24),
-  }),
-});
-
-const validationMovieId = celebrate({
-  params: Joi.object().keys({
-    movieId: Joi.string().alphanum().hex().length(24)
-      .required(),
+    movieId: Joi.string().required().length(24).hex(),
   }),
 });
 
 module.exports = {
-  validateUserBody,
-  validateEditUserInfo,
-  validateMovieBody,
-  validationUserId,
-  validationMovieId,
+  loginValid,
+  createUserValid,
+  updateUserValid,
+  createMovieValidate,
+  deleteMovieValidate,
 };
