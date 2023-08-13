@@ -1,6 +1,6 @@
 const allowedCors = [
-  'http://nice-man.diploma.nomoreparties.sbs',
-  'https://nice-man.diploma.nomoreparties.sbs',
+  'http://api.nice-man.diploma.nomoreparties.sbs',
+  'https://api.nice-man.diploma.nomoreparties.sbs',
   'http://localhost:3000',
   'https://localhost:3000',
 ];
