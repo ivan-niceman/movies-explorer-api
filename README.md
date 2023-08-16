@@ -15,8 +15,8 @@
 
 ## Ссылки на проект:
 
-IP-адрес 62.84.112.26
+IP-адрес 158.160.101.127
 
 Backend https://api.nice-man.diploma.nomoreparties.sbs
 
-[movies-explorer-api](https://github.com/ivan-niceman/movies-explorer-api)
+[GitHub](https://github.com/ivan-niceman/movies-explorer-api)
