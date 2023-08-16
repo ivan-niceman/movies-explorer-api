@@ -1,11 +1,12 @@
-const { celebrate, Joi } = require('celebrate');
-const validator = require('validator');
+const { celebrate, Joi } = require("celebrate");
+const validator = require("validator");
 
 const urlValidationHandler = (value, helpers) => {
   if (validator.isURL(value)) return value;
-  return helpers.message('Некорректный формат ссылки');
+  return helpers.message("Некорректный формат ссылки");
 };
 
+/* POST /signin */
 const loginValid = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -13,6 +14,7 @@ const loginValid = celebrate({
   }),
 });
 
+/* POST /signup */
 const createUserValid = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
@@ -21,6 +23,7 @@ const createUserValid = celebrate({
   }),
 });
 
+/* PATCH /users/me */
 const updateUserValid = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
@@ -28,6 +31,7 @@ const updateUserValid = celebrate({
   }),
 });
 
+/* POST /movies */
 const createMovieValidate = celebrate({
   body: Joi.object().keys({
     country: Joi.string().required(),
@@ -44,6 +48,7 @@ const createMovieValidate = celebrate({
   }),
 });
 
+/* DELETE /movies/:movieId */
 const deleteMovieValidate = celebrate({
   params: Joi.object().keys({
     movieId: Joi.string().required().length(24).hex(),
